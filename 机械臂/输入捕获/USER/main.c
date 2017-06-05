@@ -24,7 +24,13 @@
 	
   while(1)
  {
-  	//GetCoor();
+  	Wait_Arrive(Expect);
+	 
+	 
+	 
+	 
+	 
+	 //GetCoor();
 //	if(flag.MoveFinish == 0)
 //	{
 //	 Wait_Arrive(coor.Newx,coor.Newy); 

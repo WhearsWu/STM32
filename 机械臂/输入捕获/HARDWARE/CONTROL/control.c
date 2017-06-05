@@ -97,7 +97,6 @@ void Tran_Move(double y)
 			delay_ms(2);
 			GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
 			}
-			
 		}
 		Digital_TIM->CCR2 = Roll_stop_dut;
 	}

@@ -9,7 +9,7 @@
 #include "oled.h"
  int main(void)
 {	
-	//u32 temp=0; 
+	// u32 temp=0; 
 	//char dis[20];
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	delay_init();	    	 //延时函数初始化	

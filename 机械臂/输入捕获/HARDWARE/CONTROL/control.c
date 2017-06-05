@@ -30,36 +30,79 @@ void Roll_Move(double ang)
 		while(Curren.Roll <= ang);   //条件苛刻可能永远也达不到
 		Digital_TIM->CCR1 = 0;
 	}
-	else
+	if(ang < Curren.Roll)
 	{
-		Digital_TIM->CCR1 = Roll_inversion_dut;
+		Digital_TIM->CCR1 = 0;
 		M_R.temp = tempN;
 		while(Curren.Roll >= ang);   //条件苛刻可能永远也达不到
-		Digital_TIM->CCR1 = 0;
+		Digital_TIM->CCR1 = Roll_stop_dut;
 	}
+	else
+		Digital_TIM->CCR1 = 0;
 
 }
 void Tran_Move(double y)
 {
-//		switch(flag.TranTurn)
-//	{
-//		case 0: Digital_TIM->CCR2 = Tran_inversion_dut; break;
-//		case 1: Digital_TIM->CCR2 = Tran_corotation_dut; break;
-//	}
-	if(y > Curren.Tran)
+	u32 temp=0; 
+	char dis[20];
+	if(y > Curren.Tran+10)
 	{
 		Digital_TIM->CCR2 = Tran_corotation_dut;
 		M_T.temp = tempP;
-		while(Curren.Tran <= y);
-		Digital_TIM->CCR2 = 0;
+			GPIO_SetBits(GPIOA,GPIO_Pin_1);
+			delay_ms(2);
+			GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
+		while(Curren.Tran <= y-13)
+		{
+				
+			sprintf( dis,"%d",(u32)Curren.Tran);	//打印总的高点平时间
+			OLED_ShowString(10,0,(u8*)dis);
+			if(TIM2CH1_CAPTURE_STA&0X80)//成功捕获到了一次高电平
+			{
+				temp=TIM2CH1_CAPTURE_STA&0X3F;
+				temp*=65536;					//溢出时间总和
+				temp+=TIM2CH1_CAPTURE_VAL;		//得到总的高电平时间
+				Curren.Tran = 0.17*temp;
+
+				TIM2CH1_CAPTURE_STA=0;			//开启下一次捕获
+					GPIO_SetBits(GPIOA,GPIO_Pin_1);
+			delay_ms(2);
+			GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
+			}
+		}
+		Digital_TIM->CCR2 = Roll_stop_dut;
 	}
-	else
+	if(y < Curren.Tran-10)
 	{
 		Digital_TIM->CCR2 = Tran_inversion_dut;  
 		M_T.temp = tempN;
-		while(Curren.Tran >= y);
-		Digital_TIM->CCR2 = 0;
-	}		
+		GPIO_SetBits(GPIOA,GPIO_Pin_1);
+		delay_ms(2);
+		GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
+		while(Curren.Tran >= y+10)
+		{
+			
+		 
+			sprintf( dis,"%d",(u32)Curren.Tran);	//打印总的高点平时间
+			OLED_ShowString(10,0,(u8*)dis);
+			if(TIM2CH1_CAPTURE_STA&0X80)//成功捕获到了一次高电平
+			{
+				temp=TIM2CH1_CAPTURE_STA&0X3F;
+				temp*=65536;					//溢出时间总和
+				temp+=TIM2CH1_CAPTURE_VAL;		//得到总的高电平时间
+				Curren.Tran = 0.17*temp;
+
+				TIM2CH1_CAPTURE_STA=0;			//开启下一次捕获
+					GPIO_SetBits(GPIOA,GPIO_Pin_1);
+			delay_ms(2);
+			GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
+			}
+			
+		}
+		Digital_TIM->CCR2 = Roll_stop_dut;
+	}
+	else
+		Digital_TIM->CCR2 = Roll_stop_dut;
 	//Digital_TIM->CCR2 = Tran_corotation_dut; 
 
 

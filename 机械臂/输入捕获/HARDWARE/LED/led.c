@@ -18,6 +18,10 @@ void LED_Init(void)
  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;	    		 //LED1-->PD.2 端口配置, 推挽输出
  GPIO_Init(GPIOD, &GPIO_InitStructure);	  				 //推挽输出 ，IO口速度为50MHz
  GPIO_SetBits(GPIOD,GPIO_Pin_2); 						 //PD.2 输出高 
+	
+ GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;	    	
+ GPIO_Init(GPIOA, &GPIO_InitStructure);	  		
+ GPIO_ResetBits(GPIOA,GPIO_Pin_1); 						  
 }
  
 void Snap_Gpio_Init()

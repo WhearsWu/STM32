@@ -44,7 +44,7 @@ void macUSART_IRQHandler()
 	{		
 		rx_buf[num] = USART_ReceiveData(macUSARTx);
 		//scanf("0xaax%dy%d0xff",Cx,Cy);
-		if(rx_buf[num]=='\r')
+		if(rx_buf[num]==0x0a)
 		{			
 			//num=0x00;
 			//sscanf(rx_buf,"x=%d,y=%d",&Cx,&Cy);
@@ -52,9 +52,9 @@ void macUSART_IRQHandler()
 			//coor.OldCountRoll = coor.NewCountRoll;
 			//coor.OldCountTran = coor.NewCountTran;
 			CoorTurn(Recive,&Expect);
+
 			for(;num!=0;num--)
-				rx_buf[num] = 0;
-			//Wait_Arrive(Expect);
+				rx_buf[num]=0;
 			//flag.MoveFinish = 1;  
 			//flag.GetCoorFinish = 0;
 			

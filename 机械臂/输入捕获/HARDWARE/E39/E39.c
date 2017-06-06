@@ -37,7 +37,7 @@ char rx_buf[20];
 uint16_t num = 0;
 uint16_t STSPflag = 0;
 uint16_t Cx = 0,Cy = 0;
-//char dis[5];
+char dis[5];
 void macUSART_IRQHandler()
 {
 	if(USART_GetITStatus(macUSARTx,USART_IT_RXNE)!=RESET)

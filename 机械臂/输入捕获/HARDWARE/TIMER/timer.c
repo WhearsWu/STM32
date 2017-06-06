@@ -2,7 +2,7 @@
 #include "led.h"
 #include "usart.h"
 #include "sys.h"
-//#include "coordinate.h"
+#include "coordinate.h"
 extern MotorStat M_R;
 extern MotorStat M_T; 
 void PWM_Init()

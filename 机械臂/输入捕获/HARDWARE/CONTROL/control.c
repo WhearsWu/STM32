@@ -55,7 +55,7 @@ void Tran_Move(double y)
 		while(Curren.Tran <= y-13)
 		{
 				
-			sprintf( dis,"%d",(u32)Curren.Tran);	//打印总的高点平时间
+			sprintf( dis,"%5d",(u32)Curren.Tran);	//打印总的高点平时间
 			OLED_ShowString(10,0,(u8*)dis);
 			if(TIM2CH1_CAPTURE_STA&0X80)//成功捕获到了一次高电平
 			{
@@ -83,7 +83,7 @@ void Tran_Move(double y)
 		{
 			
 		 
-			sprintf( dis,"%d",(u32)Curren.Tran);	//打印总的高点平时间
+			sprintf( dis,"%5d",(u32)Curren.Tran);	//打印总的高点平时间
 			OLED_ShowString(10,0,(u8*)dis);
 			if(TIM2CH1_CAPTURE_STA&0X80)//成功捕获到了一次高电平
 			{
@@ -97,6 +97,7 @@ void Tran_Move(double y)
 			delay_ms(2);
 			GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
 			}
+			
 		}
 		Digital_TIM->CCR2 = Roll_stop_dut;
 	}

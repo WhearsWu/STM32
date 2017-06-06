@@ -7,10 +7,11 @@
 #include "E39.h"
 #include "bsp_usart1.h"
 #include "oled.h"
+#include "wave.h"
  int main(void)
 {	
-	u32 temp=0; 
-	char dis[20];
+	//u32 temp=0; 
+	//char dis[20];
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	delay_init();	    	 //延时函数初始化	
 	OLED_Init();			//初始化OLED  
@@ -20,12 +21,14 @@
 										//LED1 = 0; 
  	PWM_Init(); 	
  	Init_Duty;
-  Snap_Init();               //回程开关初始化
-	Cap_Init(0XFFFF,72-1);		//以1Mhz的频率计数 
-  E39_int();
+	Snap_Init();               //回程开关初始化
+	WaveInit();
+	//Cap_Init(0XFFFF,72-1);		//以1Mhz的频率计数 
+	E39_int();
 	
   while(1)
  {
+	 
 	 Wait_Arrive(Expect);
 	 
 	 //GetCoor();

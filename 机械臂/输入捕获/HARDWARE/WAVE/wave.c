@@ -1,14 +1,7 @@
 #include "wave.h"
 void Cap_Init(u16 arr,u16 psc);
 void Wave_PWM_Init(void);
-double *t;
-void WaveReflas(double *dis)
-{
-	t = dis;
-	GPIO_SetBits(GPIOA,GPIO_Pin_1);
-	delay_ms(2);
-	GPIO_ResetBits(GPIOA,GPIO_Pin_1); 	
-}
+double distance;
 void WaveInit()
 {
 	Cap_Init(0XFFFF,72-1);
@@ -64,7 +57,7 @@ void Wave_PWM_Init()
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5  , ENABLE);
  	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE); 
 	                                                                     	
-	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 ;
+	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_1 ;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA , &GPIO_InitStructure);
@@ -79,9 +72,9 @@ void Wave_PWM_Init()
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; 
 	TIM_OCInitStructure.TIM_Pulse = 100;  //占空比
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High ; 
-	TIM_OC1Init(TIM5 , &TIM_OCInitStructure); 
+	TIM_OC2Init(TIM5 , &TIM_OCInitStructure); 
   
-    TIM_CtrlPWMOutputs(TIM5,ENABLE);	
+  TIM_CtrlPWMOutputs(TIM5,ENABLE);	
 
 	TIM_OC1PreloadConfig(TIM5, TIM_OCPreload_Enable); 
 
@@ -120,8 +113,8 @@ void TIM2_IRQHandler(void)
 				temp=TIM2CH1_CAPTURE_STA&0X3F;
 				temp*=65536;					//溢出时间总和
 				temp+=TIM2CH1_CAPTURE_VAL;		//得到总的高电平时间
-				*t = 0.17*temp;
-				sprintf( dis,"%5d",(u32)*t);	//打印总的高点平时间
+				Curren.Tran = 0.17*temp;
+				sprintf( dis,"%5d",(u32)Curren.Tran);	//打印总的高点平时间
 				OLED_ShowString(10,0,(u8*)dis);
 				TIM2CH1_CAPTURE_STA=0;			//开启下一次捕获		
 			}

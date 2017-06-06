@@ -5,14 +5,25 @@ duty  dut = {0,0,0,0};
 MotorStat M_R;
 MotorStat M_T; 
 
+PID_TypDef TranPID;
 /******比较坐标*******************/
 void Wait_Arrive(coordinate exp)
 {
+	//double speed;
+	PID_Init(&TranPID);
+	//double err = 0;
 	//Cap_Reset(); //捕获计数清零
 	//Expect.Roll = x;
 	//Expect.Tran = y;
 	//Roll_Move(exp.Roll);
-	Tran_Move(exp.Tran);
+	
+	//Tran_Move(exp.Tran);
+	
+	
+	
+
+	Tran_Move(exp.Tran);	
+	
 }
 void Roll_Move(double ang)
 {
@@ -43,27 +54,55 @@ void Roll_Move(double ang)
 }
 void Tran_Move(double y)
 {
-	//u32 temp=0; 
+	TempType motortemp = tempP; 
+	double speed;
+	double err;
 	//char dis[20];
 	//double err = 0;
 	//err = y-Curren.Tran;
-	if(y-Curren.Tran>5)
+	if(y>Curren.Tran)
 	{
-		Digital_TIM->CCR2 = Tran_corotation_dut;
+		//Digital_TIM->CCR2 = Tran_corotation_dut;
 		//M_T.temp = tempP;
+		motortemp = tempP;
 	}
-	if(y-Curren.Tran<-5)
+	if(y<Curren.Tran)
 	{
-		Digital_TIM->CCR2 = Tran_inversion_dut;  
+		//Digital_TIM->CCR2 = Tran_inversion_dut;  
 		//M_T.temp = tempN;
+		motortemp = tempN;
 	}
-	while(fabs(y-Curren.Tran)>5)
-		WaveReflas(&Curren.Tran);
-	Digital_TIM->CCR2 = Roll_stop_dut;
+	do
+	{
+		err = fabs(y-Curren.Tran);
+		speed = PID_run(&TranPID,0,err*(-1));
+		moto_control(speed,motortemp);
+	}while(err<5);
+	Digital_TIM->CCR2 = 0;
 	//Digital_TIM->CCR2 = Tran_corotation_dut; 
-
-
 }
+void moto_control(double per,TempType turn)
+{
+
+	if(per)
+	{
+		if(turn)
+		{
+			if(per>=1.0)
+			 Digital_TIM->CCR2 = 30+44;
+			 Digital_TIM->CCR2 = 30+44*per;
+		}
+		else
+		{
+			if(per>=1.0)
+			 Digital_TIM->CCR2 = 78+44;
+			 Digital_TIM->CCR2 = 78+44*per;
+		}
+  }
+	else
+		Digital_TIM->CCR2 = 0;    //0~30  74~78  122~1000 都行
+}
+
 void Change_Duty(u16 Roll_duty,u16 Tran_duty,u16 Down_duty,u16 Get_duty)
 {
   Digital_TIM->CCR1 = Roll_duty;  //PA6

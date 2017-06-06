@@ -25,11 +25,11 @@
 	WaveInit();
 	//Cap_Init(0XFFFF,72-1);		//以1Mhz的频率计数 
 	E39_int();
-	
+	Expect.Tran = 155;
   while(1)
  {
-	 
 	 Wait_Arrive(Expect);
+	 
 	 
 	 //GetCoor();
 //	if(flag.MoveFinish == 0)

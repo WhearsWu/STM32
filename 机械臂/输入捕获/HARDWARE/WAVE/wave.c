@@ -4,8 +4,8 @@ void Wave_PWM_Init(void);
 double distance;
 void WaveInit()
 {
-	Cap_Init(0XFFFF,72-1);
-	Wave_PWM_Init();
+	Cap_Init(0XFFFF,72-1);  //捕获 PA0  TIM2 CH1
+	Wave_PWM_Init();       //触发  PA1  TIM5 CH2
 }
 void Cap_Init(u16 arr,u16 psc)
 {	 
@@ -46,14 +46,15 @@ void Cap_Init(u16 arr,u16 psc)
 	
 	TIM_ITConfig(TIM2,TIM_IT_Update|TIM_IT_CC1,ENABLE);//允许更新中断 ,允许CC1IE捕获中断	
 	
-  TIM_Cmd(TIM2,ENABLE ); 	//使能定时器2
+    TIM_Cmd(TIM2,ENABLE ); 	//使能定时器2
 }
 void Wave_PWM_Init()
 {  
 	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
-
+	NVIC_InitTypeDef NVIC_InitStructure;
+	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5  , ENABLE);
  	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE); 
 	                                                                     	
@@ -74,7 +75,15 @@ void Wave_PWM_Init()
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High ; 
 	TIM_OC2Init(TIM5 , &TIM_OCInitStructure); 
   
-  TIM_CtrlPWMOutputs(TIM5,ENABLE);	
+	NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;  //TIM2中断
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;  //先占优先级2级
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  //从优先级0级
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; //IRQ通道被使能
+	NVIC_Init(&NVIC_InitStructure);  //根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器 
+  
+	TIM_ITConfig(TIM5,TIM_IT_Update,ENABLE);//允许更新中断 ,允许CC1IE捕获中断
+  
+    TIM_CtrlPWMOutputs(TIM5,ENABLE);	
 
 	TIM_OC1PreloadConfig(TIM5, TIM_OCPreload_Enable); 
 
@@ -85,7 +94,8 @@ void Wave_PWM_Init()
 u8  TIM2CH1_CAPTURE_STA=0;	//输入捕获状态		    				
 u16	TIM2CH1_CAPTURE_VAL;	//输入捕获值
 u32 temp = 0;
-char dis[20];
+u32 templast = 0;
+char dis_wave[20];
 //定时器5中断服务程序	 
 void TIM2_IRQHandler(void)
 { 
@@ -113,9 +123,9 @@ void TIM2_IRQHandler(void)
 				temp=TIM2CH1_CAPTURE_STA&0X3F;
 				temp*=65536;					//溢出时间总和
 				temp+=TIM2CH1_CAPTURE_VAL;		//得到总的高电平时间
-				Curren.Tran = 0.17*temp;
-				sprintf( dis,"%5d",(u32)Curren.Tran);	//打印总的高点平时间
-				OLED_ShowString(10,0,(u8*)dis);
+				if((temp - templast)<100)
+					Curren.Tran = 0.17*temp;
+				templast = temp;
 				TIM2CH1_CAPTURE_STA=0;			//开启下一次捕获		
 			}
 			else  								//还未开始,第一次捕获上升沿
@@ -130,4 +140,16 @@ void TIM2_IRQHandler(void)
  	}
  
     TIM_ClearITPendingBit(TIM2, TIM_IT_CC1|TIM_IT_Update); //清除中断标志位
+}
+char dis_main[20];
+void TIM5_IRQHandler(void)
+{
+	
+	sprintf(dis_main,"Roll=%3d",(u16)Curren.Roll);
+	OLED_ShowString(0,0,(u8*)dis_main);
+	sprintf(dis_main,"Tran=%3d",(u16)Curren.Tran);
+	OLED_ShowString(0,2,(u8*)dis_main);
+	
+	TIM_ClearITPendingBit(TIM5,TIM_IT_Update); //清除中断标志位
+	
 }

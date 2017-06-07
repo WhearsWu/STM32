@@ -10,7 +10,7 @@ void PWM_Init()
 	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
-
+	
 	RCC_APB1PeriphClockCmd(RCC_Servo_TIM  , ENABLE);
  	RCC_APB2PeriphClockCmd(RCC_Servo_GPIO , ENABLE); 
 	                                                                     	

@@ -8,29 +8,35 @@
 #include "bsp_usart1.h"
 #include "oled.h"
 #include "wave.h"
+#include "bsp_adc.h"
  int main(void)
 {	
-	//u32 temp=0; 
-	//char dis[20];
+	
+	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	delay_init();	    	 //延时函数初始化	
-	OLED_Init();			//初始化OLED  
+	OLED_Init();			   //初始化OLED  
 	OLED_Clear(); 
 	LED_Init();		  	//初始化与LED连接的硬件接口
 										//LED0 = 0;                   //亮灯
 										//LED1 = 0; 
- 	PWM_Init(); 	
+ 	PWM_Init(); 	             //PWM
  	Init_Duty;
-	Snap_Init();               //回程开关初始化
-	WaveInit();
-	//Cap_Init(0XFFFF,72-1);		//以1Mhz的频率计数 
-	E39_int();
-	Expect.Tran = 155;
+	//Snap_Init();               //回程开关
+	WaveInit();                //超声波
+    //Adc_Init();
+	ADCx_Init();
+	E39_int();                 //无线通信
+	Expect.Tran = 300;
+	
   while(1)
  {
-	 Wait_Arrive(Expect);
-	 
-	 
+	 //Get_voltage();
+	if(ReFlag)
+	{
+		Wait_Arrive(Expect);
+		ReFlag = 0;
+	}
 	 //GetCoor();
 //	if(flag.MoveFinish == 0)
 //	{

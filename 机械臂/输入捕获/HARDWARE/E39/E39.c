@@ -37,6 +37,7 @@ char rx_buf[20];
 uint16_t num = 0;
 uint16_t STSPflag = 0;
 uint16_t Cx = 0,Cy = 0;
+u16 ReFlag = 0;
 //char dis[5];
 void macUSART_IRQHandler()
 {
@@ -48,11 +49,12 @@ void macUSART_IRQHandler()
 		{			
 			//num=0x00;
 			//sscanf(rx_buf,"x=%d,y=%d",&Cx,&Cy);
-			sscanf(rx_buf,"x=%lf,y=%lf",&Recive.Roll,&Recive.Tran);
+			//sscanf(rx_buf,"x=%lf,y=%lf",&Recive.Roll,&Recive.Tran);
+			sscanf(rx_buf,"%lf,%lf",&Recive.Roll,&Recive.Tran);
 			//coor.OldCountRoll = coor.NewCountRoll;
 			//coor.OldCountTran = coor.NewCountTran;
 			CoorTurn(Recive,&Expect);
-
+			ReFlag = 1;
 			for(;num!=0;num--)
 				rx_buf[num]=0;
 			//flag.MoveFinish = 1;  

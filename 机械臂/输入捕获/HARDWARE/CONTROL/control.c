@@ -11,6 +11,7 @@ void Wait_Arrive(coordinate exp)
 {
 	//double speed;
 	PID_Init(&TranPID);
+	TranPID.Kp = 0.35;
 	//double err = 0;
 	//Cap_Reset(); //捕获计数清零
 	//Expect.Roll = x;
@@ -19,9 +20,6 @@ void Wait_Arrive(coordinate exp)
 	
 	//Tran_Move(exp.Tran);
 	
-	
-	
-
 	Tran_Move(exp.Tran);	
 	
 }
@@ -52,11 +50,13 @@ void Roll_Move(double ang)
 		Digital_TIM->CCR1 = 0;
 
 }
+char dis_con[20];
 void Tran_Move(double y)
 {
 	TempType motortemp = tempP; 
 	double speed;
 	double err;
+	
 	//char dis[20];
 	//double err = 0;
 	//err = y-Curren.Tran;
@@ -75,9 +75,12 @@ void Tran_Move(double y)
 	do
 	{
 		err = fabs(y-Curren.Tran);
+		
 		speed = PID_run(&TranPID,0,err*(-1));
+		//sprintf(dis_con,"Roll=%3d",(u16)speed);
+		//OLED_ShowString(0,0,(u8*)dis_con);
 		moto_control(speed,motortemp);
-	}while(err<5);
+	}while(err>2);
 	Digital_TIM->CCR2 = 0;
 	//Digital_TIM->CCR2 = Tran_corotation_dut; 
 }
@@ -88,17 +91,19 @@ void moto_control(double per,TempType turn)
 	{
 		if(turn)
 		{
-			if(per>=1.0)
-			 Digital_TIM->CCR2 = 30+44;
-			 Digital_TIM->CCR2 = 30+44*per;
+			if(per>=100)
+				Digital_TIM->CCR2 = 100;
+			else
+				Digital_TIM->CCR2 = 78+0.22*per;
 		}
 		else
 		{
-			if(per>=1.0)
-			 Digital_TIM->CCR2 = 78+44;
-			 Digital_TIM->CCR2 = 78+44*per;
+			if(per>=100)
+				Digital_TIM->CCR2 = 52;
+			else
+				Digital_TIM->CCR2 = 74-0.22*per;
 		}
-  }
+	}
 	else
 		Digital_TIM->CCR2 = 0;    //0~30  74~78  122~1000 都行
 }

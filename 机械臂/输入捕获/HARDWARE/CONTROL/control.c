@@ -9,10 +9,7 @@ MotorStat M_T;
 /******±È½Ï×ø±ê*******************/
 void Wait_Arrive(coordinate exp)
 {
-
-	
 	Tran_Move(exp.Tran);	
-	
 }
 void Roll_Move(double ang)
 {
